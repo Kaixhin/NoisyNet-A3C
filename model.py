@@ -16,12 +16,14 @@ class NoisyLinear(nn.Linear):
     self.sigma_bias = Parameter(torch.Tensor(out_features))  # σ^b
     self.register_buffer('epsilon_weight', torch.zeros(out_features, in_features))
     self.register_buffer('epsilon_bias', torch.zeros(out_features))
+    self.reset_parameters()
 
   def reset_parameters(self):
-    init.uniform(self.weight, -math.sqrt(3 / self.in_features), math.sqrt(3 / self.in_features))
-    init.constant(self.bias, 0)
-    init.constant(self.sigma_weight, 0.0017)
-    init.constant(self.sigma_bias, 0)
+    if hasattr(self, 'sigma_weight'):  # Only init after all params added (otherwise super().__init__() fails)
+      init.uniform(self.weight, -math.sqrt(3 / self.in_features), math.sqrt(3 / self.in_features))
+      init.constant(self.bias, 0)
+      init.constant(self.sigma_weight, 0.0017)
+      init.constant(self.sigma_bias, 0)
 
   def forward(self, input):
     return F.linear(input, self.weight + self.sigma_weight * Variable(self.epsilon_weight), self.bias + self.sigma_bias * Variable(self.epsilon_bias))
