@@ -4,6 +4,8 @@ NoisyNet-A3C
 
 NoisyNet [[1]](#references) asynchronous advantage actor-critic (A3C) [[2]](#references) with generalised advantage estimation (GAE) [[3]](#references). The agent also receives the previous action, reward and a step counter [[4]](#references). Run with `python main.py <options>`.
 
+Run with `--no-noise` to run normal A3C (without noisy linear layers) with entropy regularisation. NoisyNet-A3C disables entropy regularisation.
+
 Requirements
 ------------
 

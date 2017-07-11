@@ -34,8 +34,9 @@ class NoisyLinear(nn.Linear):
 
 
 class ActorCritic(nn.Module):
-  def __init__(self, observation_space, action_space, hidden_size):
+  def __init__(self, observation_space, action_space, hidden_size, no_noise):
     super(ActorCritic, self).__init__()
+    self.no_noise = no_noise
     self.state_size = observation_space.shape[0]
     self.action_size = action_space.n
 
@@ -46,8 +47,12 @@ class ActorCritic(nn.Module):
     self.fc1 = nn.Linear(self.state_size, hidden_size)
     # Pass previous action, reward and timestep directly into LSTM
     self.lstm = nn.LSTMCell(hidden_size + self.action_size + 2, hidden_size)
-    self.fc_actor = NoisyLinear(hidden_size, self.action_size)
-    self.fc_critic = NoisyLinear(hidden_size, 1)
+    if no_noise:
+      self.fc_actor = nn.Linear(hidden_size, self.action_size)
+      self.fc_critic = nn.Linear(hidden_size, 1)
+    else:
+      self.fc_actor = NoisyLinear(hidden_size, self.action_size)
+      self.fc_critic = NoisyLinear(hidden_size, 1)
 
     # Xavier weight initialisation
     for name, p in self.named_parameters():
@@ -55,9 +60,10 @@ class ActorCritic(nn.Module):
         init.xavier_uniform(p)
       elif 'bias' in name:
         init.constant(p, 0)
-    # Noisy linear initialisation
-    self.fc_actor.reset_parameters()
-    self.fc_critic.reset_parameters()
+    if not no_noise:
+      # Noisy linear initialisation
+      self.fc_actor.reset_parameters()
+      self.fc_critic.reset_parameters()
 
   def forward(self, x, h):
     state, extra = x.narrow(1, 0, self.state_size), x.narrow(1, self.state_size, self.action_size + 2)
@@ -69,9 +75,11 @@ class ActorCritic(nn.Module):
     return policy, V, (h[0], h[1])
 
   def sample_noise(self):
-    self.fc_actor.sample_noise()
-    self.fc_critic.sample_noise()
+    if not self.no_noise:
+      self.fc_actor.sample_noise()
+      self.fc_critic.sample_noise()
 
   def remove_noise(self):
-    self.fc_actor.remove_noise()
-    self.fc_critic.remove_noise()
+    if not self.no_noise:
+      self.fc_actor.remove_noise()
+      self.fc_critic.remove_noise()
