@@ -2,7 +2,7 @@ NoisyNet-A3C
 ============
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-NoisyNet [[1]](#references) asynchronous advantage actor-critic (A3C) [[2]](#references) with generalised advantage estimation (GAE) [[3]](#references). The agent also receives the previous action, reward and a step counter [[4]](#references). Run with `python main.py <options>`.
+NoisyNet [[1]](#references) (LSTM) asynchronous advantage actor-critic (A3C) [[2]](#references) with generalised advantage estimation (GAE) [[3]](#references). The agent also receives the previous action, reward and a step counter [[4]](#references). Run with `python main.py <options>`.
 
 Run with `--no-noise` to run normal A3C (without noisy linear layers) with entropy regularisation. NoisyNet-A3C disables entropy regularisation.
 
@@ -13,6 +13,17 @@ Requirements
 - [PyTorch](http://pytorch.org/)
 - [OpenAI Gym](https://gym.openai.com/)
 - [Plotly](https://plot.ly/python/)
+
+Results
+-------
+
+### NoisyNet-A3C
+
+![NoisyNet-A3C](figures/noisynet-a3c.png)
+
+### A3C
+
+![A3C](figures/a3c.png)
 
 Acknowledgements
 ----------------
