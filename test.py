@@ -42,6 +42,7 @@ def test(rank, args, T, shared_model):
             state = state_to_tensor(env.reset())
             action, reward, done, episode_length = 0, 0, False, 0
             reward_sum = 0
+            model.remove_noise()  # Run without noise
 
           # Optionally render validation states
           if args.render:

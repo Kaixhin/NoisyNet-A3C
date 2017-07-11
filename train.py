@@ -51,6 +51,7 @@ def train(rank, args, T, shared_model, optimiser):
       # Perform truncated backpropagation-through-time (allows freeing buffers after backwards call)
       hx = hx.detach()
       cx = cx.detach()
+    model.sample_noise()  # Pick a new noise vector (until next optimisation step)
 
     # Lists of outputs for training
     values, log_probs, rewards, entropies = [], [], [], []
