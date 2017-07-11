@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import torch
 from torch import nn
 from torch.nn import init
 
@@ -33,4 +34,4 @@ class ActorCritic(nn.Module):
     x = h[0]
     policy = self.softmax(self.fc_actor(x)).clamp(max=1 - 1e-20)  # Prevent 1s and hence NaNs
     V = self.fc_critic(x)
-    return policy, V, (hx, cx)
+    return policy, V, (h[0], h[1])
