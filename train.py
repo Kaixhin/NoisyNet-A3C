@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import gym
 import torch
 from torch import nn
@@ -7,6 +8,7 @@ from model import ActorCritic
 from utils import action_to_one_hot, extend_input, state_to_tensor
 
 
+# Transfers gradients from thread-specific model to shared model
 def _transfer_grads_to_shared_model(model, shared_model):
   for param, shared_param in zip(model.parameters(), shared_model.parameters()):
     if shared_param.grad is not None:
@@ -116,8 +118,8 @@ def train(rank, args, T, shared_model, optimiser):
     optimiser.zero_grad()
     # Note that losses were defined as negatives of normal update rules for gradient descent
     (policy_loss + value_loss).backward(retain_variables=args.no_truncate)
-    # Gradient (L2) norm clipping
-    nn.utils.clip_grad_norm(model.parameters(), args.max_gradient_norm)
+    # Gradient (L2) normalisation
+    nn.utils.clip_grad_norm(model.parameters(), args.max_gradient_norm, 2)
 
     # Transfer gradients to shared model and update
     _transfer_grads_to_shared_model(model, shared_model)
