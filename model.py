@@ -21,9 +21,9 @@ class NoisyLinear(nn.Linear):
   def reset_parameters(self):
     if hasattr(self, 'sigma_weight'):  # Only init after all params added (otherwise super().__init__() fails)
       init.uniform(self.weight, -math.sqrt(3 / self.in_features), math.sqrt(3 / self.in_features))
-      init.constant(self.bias, 0)
-      init.constant(self.sigma_weight, 0.0017)
-      init.constant(self.sigma_bias, 0)
+      init.uniform(self.bias, -math.sqrt(3 / self.in_features), math.sqrt(3 / self.in_features))
+      init.constant(self.sigma_weight, 0.017)
+      init.constant(self.sigma_bias, 0.017)
 
   def forward(self, input):
     return F.linear(input, self.weight + self.sigma_weight * Variable(self.epsilon_weight), self.bias + self.sigma_bias * Variable(self.epsilon_bias))
@@ -57,17 +57,6 @@ class ActorCritic(nn.Module):
     else:
       self.fc_actor = NoisyLinear(hidden_size, self.action_size)
       self.fc_critic = NoisyLinear(hidden_size, 1)
-
-    # Xavier weight initialisation
-    for name, p in self.named_parameters():
-      if 'weight' in name:
-        init.xavier_uniform(p)
-      elif 'bias' in name:
-        init.constant(p, 0)
-    if not no_noise:
-      # Noisy linear initialisation
-      self.fc_actor.reset_parameters()
-      self.fc_critic.reset_parameters()
 
   def forward(self, x, h):
     state, extra = x.narrow(1, 0, self.state_size), x.narrow(1, self.state_size, self.action_size + 2)
