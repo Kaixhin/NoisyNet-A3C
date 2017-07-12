@@ -21,7 +21,6 @@ parser.add_argument('--max-episode-length', type=int, default=500, metavar='LENG
 parser.add_argument('--hidden-size', type=int, default=32, metavar='SIZE', help='Hidden size of LSTM cell')
 parser.add_argument('--model', type=str, metavar='PARAMS', help='Pretrained model (state dict)')
 parser.add_argument('--discount', type=float, default=0.99, metavar='γ', help='Discount factor')
-parser.add_argument('--trace-decay', type=float, default=1, metavar='λ', help='Eligibility trace decay factor')
 parser.add_argument('--reward-clip', action='store_true', help='Clip rewards to [-1, 1]')
 parser.add_argument('--lr', type=float, default=0.001, metavar='η', help='Learning rate')
 parser.add_argument('--no-lr-decay', action='store_true', help='Disable linearly decaying learning rate to 0')

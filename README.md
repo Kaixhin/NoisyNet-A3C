@@ -2,7 +2,7 @@ NoisyNet-A3C
 ============
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-NoisyNet [[1]](#references) (LSTM) asynchronous advantage actor-critic (A3C) [[2]](#references) with generalised advantage estimation (GAE) [[3]](#references). Run with `python main.py <options>`. Entropy regularisation can still be added by setting `--entropy-weight <value>`, but it is 0 by default. Run with `--no-noise` to run normal A3C (without noisy linear layers).
+NoisyNet [[1]](#references) (LSTM) asynchronous advantage actor-critic (A3C) [[2]](#references). Run with `python main.py <options>`. Entropy regularisation can still be added by setting `--entropy-weight <value>`, but it is 0 by default. Run with `--no-noise` to run normal A3C (without noisy linear layers).
 
 Requirements
 ------------
@@ -17,11 +17,15 @@ Results
 
 ### NoisyNet-A3C
 
-On the whole, NoisyNet-A3C tends to be better than A3C (with or without entropy regularisation). There seems to be more variance, with both good and poor runs (two examples below), probably due to "deep" exploration.
+On the whole, NoisyNet-A3C tends to be better than A3C (with or without entropy regularisation). There seems to be more variance, with both good and poor runs, probably due to "deep" exploration.
 
 ![Good-NoisyNet-A3C](figures/good-noisynet-a3c.png)
 
 ![Bad-NoisyNet-A3C](figures/bad-noisynet-a3c.png)
+
+NoisyNet-A3C is perhaps even more prone to performance collapses than normal A3C. Many deep reinforcement learning algorithms are still prone to this.
+
+![Collapse-NoisyNet-A3C](figures/collapse-noisynet-a3c.png)
 
 ### A3C (no entropy regularisation)
 
@@ -47,4 +51,3 @@ References
 
 [1] [Noisy Networks for Exploration](https://arxiv.org/abs/1706.10295)  
 [2] [Asynchronous Methods for Deep Reinforcement Learning](http://arxiv.org/abs/1602.01783)  
-[3] [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438)  

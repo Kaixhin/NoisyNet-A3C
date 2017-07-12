@@ -66,6 +66,9 @@ def test(rank, args, T, shared_model):
             avg_episode_lengths.append(episode_length)
             break
 
+      if args.evaluate:
+        return
+
       print(('[{}] Step: {:<' + l + '} Avg. Reward: {:<8} Avg. Episode Length: {:<8}').format(
             datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S,%f')[:-3],
             t_start,
@@ -76,8 +79,6 @@ def test(rank, args, T, shared_model):
       plot_line(steps, rewards)  # Plot rewards
       torch.save(model.state_dict(), 'model.pth')  # Save model params
       can_test = False  # Finish testing
-      if args.evaluate:
-        return
     else:
       if T.value() - t_start >= args.evaluation_interval:
         can_test = True

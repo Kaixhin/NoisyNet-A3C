@@ -90,7 +90,6 @@ def train(rank, args, T, shared_model, optimiser):
     # Train the network
     policy_loss = 0
     value_loss = 0
-    A_GAE = torch.zeros(1, 1)  # Generalised advantage estimator Ψ
     # Calculate n-step returns in forward view, stepping backwards from the last state
     trajectory_length = len(rewards)
     for i in reversed(range(trajectory_length)):
@@ -101,12 +100,8 @@ def train(rank, args, T, shared_model, optimiser):
       # dθ ← dθ - ∂A^2/∂θ
       value_loss += 0.5 * A ** 2  # Least squares error
 
-      # TD residual δ = r + γV(s_i+1; θ) - V(s_i; θ)
-      td_error = rewards[i] + args.discount * values[i + 1].data - values[i].data
-      # Generalised advantage estimator Ψ (roughly of form ∑(γλ)^t∙δ)
-      A_GAE = A_GAE * args.discount * args.trace_decay + td_error
-      # dθ ← dθ + ∇θ∙log(π(a_i|s_i; θ))∙Ψ
-      policy_loss -= log_probs[i] * Variable(A_GAE)  # Policy gradient loss
+      # dθ ← dθ + ∇θ∙log(π(a_i|s_i; θ))∙A
+      policy_loss -= log_probs[i] * A  # Policy gradient loss
       # dθ ← dθ + β∙∇θH(π(s_i; θ))
       policy_loss -= args.entropy_weight * entropies[i]  # Entropy maximisation loss
 
