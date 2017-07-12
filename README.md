@@ -2,7 +2,9 @@ NoisyNet-A3C
 ============
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-NoisyNet [[1]](#references) (LSTM) asynchronous advantage actor-critic (A3C) [[2]](#references). Run with `python main.py <options>`. Entropy regularisation can still be added by setting `--entropy-weight <value>`, but it is 0 by default. Run with `--no-noise` to run normal A3C (without noisy linear layers).
+NoisyNet [[1]](#references) (LSTM) asynchronous advantage actor-critic (A3C) [[2]](#references) on the CartPole-v1 environment. This repo has a minimalistic design and a classic control environment to enable quick investigation of different hyperparameters.
+
+Run with `python main.py <options>`. Entropy regularisation can still be added by setting `--entropy-weight <value>`, but it is 0 by default. Run with `--no-noise` to run normal A3C (without noisy linear layers).
 
 Requirements
 ------------
