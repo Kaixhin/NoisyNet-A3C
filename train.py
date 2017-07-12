@@ -5,7 +5,7 @@ from torch import nn
 from torch.autograd import Variable
 
 from model import ActorCritic
-from utils import action_to_one_hot, extend_input, state_to_tensor
+from utils import state_to_tensor
 
 
 # Transfers gradients from thread-specific model to shared model
@@ -27,7 +27,6 @@ def train(rank, args, T, shared_model, optimiser):
 
   env = gym.make(args.env)
   env.seed(args.seed + rank)
-  action_size = env.action_space.n
   model = ActorCritic(env.observation_space, env.action_space, args.hidden_size, args.no_noise)
   model.train()
 
@@ -46,7 +45,7 @@ def train(rank, args, T, shared_model, optimiser):
       cx = Variable(torch.zeros(1, args.hidden_size))
       # Reset environment and done flag
       state = state_to_tensor(env.reset())
-      action, reward, done, episode_length = 0, 0, False, 0
+      done, episode_length = False, 0
     else:
       # Perform truncated backpropagation-through-time (allows freeing buffers after backwards call)
       hx = hx.detach()
@@ -57,9 +56,8 @@ def train(rank, args, T, shared_model, optimiser):
     values, log_probs, rewards, entropies = [], [], [], []
 
     while not done and t - t_start < args.t_max:
-      input = extend_input(state, action_to_one_hot(action, action_size), reward, episode_length)
       # Calculate policy and value
-      policy, value, (hx, cx) = model(Variable(input), (hx, cx))
+      policy, value, (hx, cx) = model(Variable(state), (hx, cx))
       log_policy = policy.log()
       entropy = -(log_policy * policy).sum(1)
 
@@ -73,7 +71,6 @@ def train(rank, args, T, shared_model, optimiser):
       state = state_to_tensor(state)
       reward = args.reward_clip and min(max(reward, -1), 1) or reward  # Optionally clamp rewards
       done = done or episode_length >= args.max_episode_length
-      episode_length += 1  # Increase episode counter
 
       # Save outputs for training
       [arr.append(el) for arr, el in zip((values, log_probs, rewards, entropies), (value, log_prob, reward, entropy))]
@@ -86,7 +83,7 @@ def train(rank, args, T, shared_model, optimiser):
     if done:
       R = Variable(torch.zeros(1, 1))
     else:
-      _, R, _ = model(Variable(input), (hx, cx))
+      _, R, _ = model(Variable(state), (hx, cx))
       R = R.detach()
     values.append(R)
 

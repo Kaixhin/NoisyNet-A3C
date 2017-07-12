@@ -6,7 +6,7 @@ import torch
 from torch.autograd import Variable
 
 from model import ActorCritic
-from utils import action_to_one_hot, extend_input, state_to_tensor, plot_line
+from utils import state_to_tensor, plot_line
 
 
 def test(rank, args, T, shared_model):
@@ -14,7 +14,6 @@ def test(rank, args, T, shared_model):
 
   env = gym.make(args.env)
   env.seed(args.seed + rank)
-  action_size = env.action_space.n
   model = ActorCritic(env.observation_space, env.action_space, args.hidden_size, args.no_noise)
   model.eval()
 
@@ -40,7 +39,7 @@ def test(rank, args, T, shared_model):
             cx = Variable(torch.zeros(1, args.hidden_size), volatile=True)
             # Reset environment and done flag
             state = state_to_tensor(env.reset())
-            action, reward, done, episode_length = 0, 0, False, 0
+            done, episode_length = False, 0
             reward_sum = 0
             model.remove_noise()  # Run without noise
 
@@ -49,8 +48,7 @@ def test(rank, args, T, shared_model):
             env.render()
 
           # Calculate policy
-          input = extend_input(state, action_to_one_hot(action, action_size), reward, episode_length)
-          policy, _, (hx, cx) = model(Variable(input, volatile=True), (hx.detach(), cx.detach()))  # Break graph for memory efficiency
+          policy, _, (hx, cx) = model(Variable(state, volatile=True), (hx.detach(), cx.detach()))  # Break graph for memory efficiency
 
           # Choose action greedily
           action = policy.max(1)[1].data[0, 0]
