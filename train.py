@@ -27,7 +27,7 @@ def train(rank, args, T, shared_model, optimiser):
 
   env = gym.make(args.env)
   env.seed(args.seed + rank)
-  model = ActorCritic(env.observation_space, env.action_space, args.hidden_size, args.no_noise)
+  model = ActorCritic(env.observation_space, env.action_space, args.hidden_size, args.sigma_init, args.no_noise)
   model.train()
 
   t = 1  # Thread step counter

@@ -19,6 +19,7 @@ parser.add_argument('--T-max', type=int, default=500000, metavar='STEPS', help='
 parser.add_argument('--t-max', type=int, default=100, metavar='STEPS', help='Max number of forward steps for A3C before update')
 parser.add_argument('--max-episode-length', type=int, default=500, metavar='LENGTH', help='Maximum episode length')
 parser.add_argument('--hidden-size', type=int, default=32, metavar='SIZE', help='Hidden size of LSTM cell')
+parser.add_argument('--sigma-init', type=float, default=0.017, metavar='σ', help='Noisy linear layer sigma initialisation constant')
 parser.add_argument('--model', type=str, metavar='PARAMS', help='Pretrained model (state dict)')
 parser.add_argument('--discount', type=float, default=0.99, metavar='γ', help='Discount factor')
 parser.add_argument('--reward-clip', action='store_true', help='Clip rewards to [-1, 1]')
@@ -51,7 +52,7 @@ if __name__ == '__main__':
 
   # Create shared network
   env = gym.make(args.env)
-  shared_model = ActorCritic(env.observation_space, env.action_space, args.hidden_size, args.no_noise)
+  shared_model = ActorCritic(env.observation_space, env.action_space, args.hidden_size, args.sigma_init, args.no_noise)
   shared_model.share_memory()
   if args.model and os.path.isfile(args.model):
     # Load pretrained weights
