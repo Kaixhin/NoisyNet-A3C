@@ -105,7 +105,7 @@ def train(rank, args, T, shared_model, optimiser):
       # dθ ← dθ + β∙∇θH(π(s_i; θ))
       policy_loss -= args.entropy_weight * entropies[i]  # Entropy maximisation loss
 
-    # Optionally normalise loss by number of time steps
+    # Optionally normalise loss by number of time steps (better gradients for adaptive gradient optimisers)
     if not args.no_time_normalisation:
       policy_loss /= trajectory_length
       value_loss /= trajectory_length
