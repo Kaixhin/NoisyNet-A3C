@@ -66,14 +66,26 @@ def test(rank, args, T, shared_model):
             avg_episode_lengths.append(episode_length)
             break
 
-      if args.evaluate:
-        return
-
       print(('[{}] Step: {:<' + l + '} Avg. Reward: {:<8} Avg. Episode Length: {:<8}').format(
             datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S,%f')[:-3],
             t_start,
             sum(avg_rewards) / args.evaluation_episodes,
             sum(avg_episode_lengths) / args.evaluation_episodes))
+      if not args.no_noise:
+        print(('[{}] Step: {:<' + l + '} Avg. σ^w (π): {:<8} Avg. Sigma σ^b (π): {:<8}').format(
+              datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S,%f')[:-3],
+              t_start,
+              model.fc_actor.sigma_weight.abs().mean().data[0],
+              model.fc_actor.sigma_bias.abs().mean().data[0]))
+        print(('[{}] Step: {:<' + l + '} Avg. σ^w (V): {:<8} Avg. Sigma σ^b (V): {:<8}').format(
+              datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S,%f')[:-3],
+              t_start,
+              model.fc_critic.sigma_weight.abs().mean().data[0],
+              model.fc_critic.sigma_bias.abs().mean().data[0]))
+
+      if args.evaluate:
+        return
+
       rewards.append(avg_rewards)  # Keep all evaluations
       steps.append(t_start)
       plot_line(steps, rewards)  # Plot rewards
