@@ -101,7 +101,7 @@ def train(rank, args, T, shared_model, optimiser):
       value_loss += 0.5 * A ** 2  # Least squares error
 
       # dθ ← dθ + ∇θ∙log(π(a_i|s_i; θ))∙A
-      policy_loss -= log_probs[i] * A  # Policy gradient loss
+      policy_loss -= log_probs[i] * A.detach()  # Policy gradient loss (detached from critic)
       # dθ ← dθ + β∙∇θH(π(s_i; θ))
       policy_loss -= args.entropy_weight * entropies[i]  # Entropy maximisation loss
 
