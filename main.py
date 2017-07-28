@@ -28,7 +28,6 @@ parser.add_argument('--no-lr-decay', action='store_true', help='Disable linearly
 parser.add_argument('--rmsprop-decay', type=float, default=0.99, metavar='α', help='RMSprop decay factor')
 parser.add_argument('--no-noise', action='store_true', help='Disable noisy linear layers')
 parser.add_argument('--entropy-weight', type=float, default=0, metavar='β', help='Entropy regularisation weight')  # A3C default is 0.01 for Atari games
-parser.add_argument('--no-time-normalisation', action='store_true', help='Disable normalising loss by number of time steps')
 parser.add_argument('--max-gradient-norm', type=float, default=40, metavar='VALUE', help='Max value of gradient L2 norm')
 parser.add_argument('--evaluate', action='store_true', help='Evaluate only')
 parser.add_argument('--evaluation-interval', type=int, default=25000, metavar='STEPS', help='Number of training steps between evaluations (roughly)')
