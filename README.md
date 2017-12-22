@@ -9,10 +9,11 @@ Run with `python main.py <options>`. Entropy regularisation can still be added b
 Requirements
 ------------
 
-- [Python](https://www.python.org/)
-- [PyTorch](http://pytorch.org/)
 - [OpenAI Gym](https://gym.openai.com/)
 - [Plotly](https://plot.ly/python/)
+- [PyTorch](http://pytorch.org/)
+
+To install all dependencies with Anaconda run `conda env create -f environment.yml` and use `source activate noisynet` to activate the environment.
 
 Results
 -------
