@@ -85,30 +85,28 @@ def train(rank, args, T, shared_model, optimiser):
     else:
       _, R, _ = model(Variable(state), (hx, cx))
       R = R.detach()
-    values.append(R)
 
-    # Train the network
-    policy_loss = 0
-    value_loss = 0
     # Calculate n-step returns in forward view, stepping backwards from the last state
     trajectory_length = len(rewards)
+    values, log_probs, entropies = torch.cat(values), torch.cat(log_probs), torch.cat(entropies)
+    returns = Variable(torch.Tensor(trajectory_length + 1, 1))
+    returns[-1] = R
     for i in reversed(range(trajectory_length)):
       # R ← r_i + γR
-      R = rewards[i] + args.discount * R
-      # Advantage A = R - V(s_i; θ)
-      A = R - values[i]
-      # dθ ← dθ - ∂A^2/∂θ
-      value_loss += 0.5 * A ** 2  # Least squares error
+      returns[i] = rewards[i] + args.discount * returns[i + 1]
+    # Advantage A = R - V(s_i; θ)
+    A = returns[:-1] - values
+    # dθ ← dθ - ∂A^2/∂θ
+    value_loss = 0.5 * A ** 2  # Least squares error
 
-      # dθ ← dθ + ∇θ∙log(π(a_i|s_i; θ))∙A
-      policy_loss -= log_probs[i] * A.detach()  # Policy gradient loss (detached from critic)
-      # dθ ← dθ + β∙∇θH(π(s_i; θ))
-      policy_loss -= args.entropy_weight * entropies[i]  # Entropy maximisation loss
-
+    # dθ ← dθ + ∇θ∙log(π(a_i|s_i; θ))∙A
+    policy_loss = -log_probs * A.detach()  # Policy gradient loss (detached from critic)
+    # dθ ← dθ + β∙∇θH(π(s_i; θ))
+    policy_loss -= args.entropy_weight * entropies.unsqueeze(1)  # Entropy maximisation loss
     # Zero shared and local grads
     optimiser.zero_grad()
     # Note that losses were defined as negatives of normal update rules for gradient descent
-    (policy_loss + value_loss).backward()
+    (policy_loss + value_loss).sum().backward()
     # Gradient L2 normalisation
     nn.utils.clip_grad_norm(model.parameters(), args.max_gradient_norm, 2)
 
